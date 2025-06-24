@@ -1,5 +1,51 @@
 ;; Core Multisig Wallet Implementation
 
+;; Constants
+(define-constant MAX-OWNERS u10)
+(define-constant MIN-SIGNATURES u1)
+(define-constant MAX-SIGNATURES u10)
+(define-constant PRIORITY-STANDARD u1)
+
+;; Error constants
+(define-constant ERR-UNAUTHORIZED (err u100))
+(define-constant ERR-TRANSACTION-NOT-FOUND (err u101))
+(define-constant ERR-INSUFFICIENT-SIGNATURES (err u102))
+(define-constant ERR-INVALID-TRANSACTION (err u103))
+(define-constant ERR-OWNER-LIMIT-REACHED (err u104))
+(define-constant ERR-OWNER-EXISTS (err u105))
+(define-constant ERR-TRANSACTION-ALREADY-EXECUTED (err u106))
+
+;; Data variables
+(define-data-var total-owners uint u0)
+(define-data-var next-transaction-id uint u1)
+
+;; Data maps
+(define-map wallet-owners
+  { owner: principal }
+  { 
+    priority: uint,
+    active: bool,
+    added-at: uint
+  }
+)
+
+(define-map wallet-transactions
+  { tx-id: uint }
+  {
+    destination: principal,
+    amount: uint,
+    signatures: (list 10 principal),
+    executed: bool,
+    created-at: uint,
+    required-signatures: uint
+  }
+)
+
+(define-map wallet-config
+  { config-key: (string-ascii 32) }
+  { value: uint }
+)
+
 ;; Private functions
 
 ;; Check if a principal is a valid wallet owner
